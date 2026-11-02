@@ -49,9 +49,14 @@
 
       <form id="panel-paste" role="tabpanel" aria-labelledby="tab-paste" class="panel" hidden>
         <ol class="steps">
-          <li>Open your games page: <code>https://steamcommunity.com/id/<em>yourname</em>/games/?tab=all</code>
-            (or <code>/profiles/<em>7656…</em>/games/?tab=all</code>).</li>
-          <li>View the page source (<kbd>Ctrl</kbd>+<kbd>U</kbd>, or <kbd>⌘</kbd>+<kbd>⌥</kbd>+<kbd>U</kbd> on a Mac), select all and copy.</li>
+          <li id="step-open">Open your games page: <code>https://steamcommunity.com/id/<em>yourname</em>/games/?tab=all</code>
+            (or <code>/profiles/<em>7656…</em>/games/?tab=all</code>). Enter your profile on the Steam profile tab to get a direct link.</li>
+          <li id="step-open-personal" hidden>Open your games page:
+            <a id="games-link" href="#" target="_blank" rel="noopener"></a></li>
+          <li>View the page source (<kbd>Ctrl</kbd>+<kbd>U</kbd>, or <kbd>⌘</kbd>+<kbd>⌥</kbd>+<kbd>U</kbd> on a Mac), select all and copy.
+            <span id="step-source-personal" hidden>Or paste this into the address bar:
+              <code id="source-url"></code>
+              <button type="button" id="copy-source" class="link">Copy</button></span></li>
           <li>Paste it below.</li>
         </ol>
         <p class="hint">Also accepted: a <code>GetOwnedGames</code> JSON response, Steam store links, or a plain list of game names, one per line.</p>

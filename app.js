@@ -577,12 +577,44 @@
 
   // ---------- Wiring ----------
 
+  // Point the manual-paste steps at the profile typed on the Steam profile tab.
+  function updatePasteLinks() {
+    const profile = parseProfileInput($('profile').value);
+    const ok = profile && !profile.error;
+    $('step-open').hidden = !!ok;
+    $('step-open-personal').hidden = !ok;
+    $('step-source-personal').hidden = !ok;
+    if (!ok) return;
+    const gamesUrl = `https://steamcommunity.com/${profile.kind}/${encodeURIComponent(profile.id)}/games/?tab=all`;
+    $('games-link').href = gamesUrl;
+    $('games-link').textContent = gamesUrl;
+    // Browsers block links to view-source:, so it is offered for copying instead.
+    $('source-url').textContent = `view-source:${gamesUrl}`;
+    $('copy-source').textContent = 'Copy';
+  }
+
+  async function copySourceUrl() {
+    const text = $('source-url').textContent;
+    try {
+      await navigator.clipboard.writeText(text);
+      $('copy-source').textContent = 'Copied';
+    } catch {
+      const r = document.createRange();
+      r.selectNodeContents($('source-url'));
+      const sel = getSelection();
+      sel.removeAllRanges();
+      sel.addRange(r);
+      $('copy-source').textContent = 'Press Ctrl+C';
+    }
+  }
+
   function selectTab(which) {
     const profile = which === 'profile';
     $('tab-profile').setAttribute('aria-selected', String(profile));
     $('tab-paste').setAttribute('aria-selected', String(!profile));
     $('panel-profile').hidden = !profile;
     $('panel-paste').hidden = profile;
+    if (!profile) updatePasteLinks();
   }
 
   function init() {
@@ -617,6 +649,9 @@
     const fromUrl = new URLSearchParams(location.search).get('profile');
     const initial = fromUrl || LS.get('profile') || '';
     $('profile').value = initial;
+    $('profile').addEventListener('input', updatePasteLinks);
+    $('copy-source').addEventListener('click', copySourceUrl);
+    updatePasteLinks();
     if (fromUrl) runProfile(fromUrl);
     else loadCompat().catch(() => { /* reported when the user compares */ });
   }
