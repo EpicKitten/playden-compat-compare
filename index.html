@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Playden Library Check</title>
+  <meta name="description" content="Compare your Steam library against the Playden PS5 compatibility list.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <h1>Playden Library Check</h1>
+    <p class="lede">Paste your Steam profile link to see which of your games are on the
+      <a href="https://github.com/leolobato/playden-ps5/blob/main/COMPATIBILITY.md" target="_blank" rel="noopener">Playden PS5 compatibility list</a>
+      and how they run.</p>
+  </header>
+
+  <main>
+    <section class="card" id="input-card">
+      <div class="tabs" role="tablist">
+        <button role="tab" class="tab" id="tab-profile" aria-selected="true" aria-controls="panel-profile">Steam profile</button>
+        <button role="tab" class="tab" id="tab-paste" aria-selected="false" aria-controls="panel-paste">Paste manually</button>
+      </div>
+
+      <form id="panel-profile" role="tabpanel" aria-labelledby="tab-profile" class="panel">
+        <label for="profile">Steam profile URL, custom name or SteamID64</label>
+        <div class="row">
+          <input id="profile" name="profile" type="text" autocomplete="off" spellcheck="false"
+                 placeholder="https://steamcommunity.com/id/yourname">
+          <button type="submit" id="go" class="primary">Compare</button>
+        </div>
+        <p class="hint">Your profile and <strong>Game details</strong> must be public
+          (Steam › Edit Profile › Privacy Settings).</p>
+
+        <details class="advanced">
+          <summary>Connection settings</summary>
+          <p class="hint">Steam does not let web pages read its data directly, so this page fetches your games list through a
+            public CORS proxy. If one fails, the next is tried. You can add your own; use <code>{url}</code> where the
+            encoded Steam URL goes.</p>
+          <label for="proxies">Proxies (one per line, tried in order)</label>
+          <textarea id="proxies" rows="4" spellcheck="false"></textarea>
+          <label for="apikey">Steam Web API key (optional)</label>
+          <input id="apikey" type="password" autocomplete="off" spellcheck="false" placeholder="Only used if the profile page can't be read">
+          <p class="hint warn">The key is sent through the proxy above and kept only in this browser.
+            Get one at <a href="https://steamcommunity.com/dev/apikey" target="_blank" rel="noopener">steamcommunity.com/dev/apikey</a>.</p>
+          <button type="button" id="reset-proxies" class="link">Reset to defaults</button>
+        </details>
+      </form>
+
+      <form id="panel-paste" role="tabpanel" aria-labelledby="tab-paste" class="panel" hidden>
+        <ol class="steps">
+          <li>Open your games page: <code>https://steamcommunity.com/id/<em>yourname</em>/games/?tab=all</code>
+            (or <code>/profiles/<em>7656…</em>/games/?tab=all</code>).</li>
+          <li>View the page source (<kbd>Ctrl</kbd>+<kbd>U</kbd>, or <kbd>⌘</kbd>+<kbd>⌥</kbd>+<kbd>U</kbd> on a Mac), select all and copy.</li>
+          <li>Paste it below.</li>
+        </ol>
+        <p class="hint">Also accepted: a <code>GetOwnedGames</code> JSON response, Steam store links, or a plain list of game names, one per line.</p>
+        <textarea id="pasted" rows="8" spellcheck="false" placeholder="Paste here…"></textarea>
+        <div class="row end"><button type="submit" class="primary">Compare</button></div>
+      </form>
+
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+    </section>
+
+    <section id="results" hidden>
+      <div class="card profile-line" id="profile-line"></div>
+
+      <div class="stats" id="stats"></div>
+
+      <div class="card">
+        <div class="toolbar">
+          <input id="filter-text" type="search" placeholder="Filter games…" aria-label="Filter games">
+          <div class="chips" id="chips" role="group" aria-label="Filter by status"></div>
+        </div>
+        <div class="table-wrap">
+          <table class="games">
+            <thead>
+              <tr>
+                <th scope="col">Game</th>
+                <th scope="col">Status</th>
+                <th scope="col" class="col-kit">Kit</th>
+                <th scope="col" class="col-tech">Engine · Graphics · CPU</th>
+                <th scope="col">Notes</th>
+              </tr>
+            </thead>
+            <tbody id="matches"></tbody>
+          </table>
+        </div>
+        <p class="empty" id="matches-empty" hidden>No games match the filter.</p>
+      </div>
+
+      <details class="card untested" id="untested">
+        <summary><span id="untested-title">Not on the list yet</span></summary>
+        <p class="hint">Nobody has reported these yet. If you try one on Playden,
+          <a href="https://github.com/leolobato/playden-ps5/issues/new?template=test-report.yml" target="_blank" rel="noopener">open a test report</a>,
+          even when it works.</p>
+        <input id="untested-filter" type="search" placeholder="Filter…" aria-label="Filter untested games">
+        <ul id="untested-list" class="untested-list"></ul>
+      </details>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Not affiliated with Valve or Playden. Compatibility data from
+      <a href="https://github.com/leolobato/playden-ps5" target="_blank" rel="noopener">leolobato/playden-ps5</a>, loaded live.
+      <span id="compat-updated"></span></p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
